@@ -1,18 +1,18 @@
-import { fullScreenCard } from "../index.js";
-
 // @todo: Темплейт карточки
 export const articleTemplate = document.querySelector("#card-template").content;
 
 // @todo: Функция создания карточки
-export function createCard(name, link, delCard, fullScreenCards, likeCard) {
+export function createCard(name, link, removeCard, likeCard, openImageModal) {
   const cardElement = articleTemplate.querySelector(".card").cloneNode(true);
   const deleteButton = cardElement.querySelector(".card__delete-button");
-  cardElement.querySelector(".card__image").src = link;
-  cardElement.querySelector(".card__image").alt = name;
+  const likeButton = cardElement.querySelector(".card__like-button");
+  const cardImage = cardElement.querySelector(".card__image");
+  cardImage.src = link;
+  cardImage.alt = name;
   cardElement.querySelector(".card__title").textContent = name;
-  deleteButton.addEventListener("click", delCard);
-  cardElement.addEventListener("click", fullScreenCard);
-  cardElement.addEventListener("click", likeCards);
+  deleteButton.addEventListener("click", removeCard);
+  cardImage.addEventListener("click", openImageModal);
+  likeButton.addEventListener("click", likeCard);
   return cardElement;
 }
 
@@ -23,9 +23,6 @@ export function removeCard(event) {
 }
 
 //функция лайка
-export function likeCards(event) {
-  const likeButton = event.target.closest(".card__like-button"); //получаю event.target лайка
-  if (event.target === likeButton) {
-    likeButton.classList.toggle("card__like-button_is-active"); //навешиваю или снимаю лайк
-  }
+export function likeCard(event) {
+  event.target.classList.toggle("card__like-button_is-active"); //навешиваю или снимаю лайк
 }
