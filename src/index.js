@@ -29,6 +29,62 @@ const addCardForm = document.forms["new-place"];
 const popupInputTypeName = document.querySelector(".popup__input_type_name");
 const popupInputTypeDescription = document.querySelector(".popup__input_type_description");
 
+
+
+
+
+const showInputError = (formElement, inputElement, errorMessage) => { //функция показа ошибки, принимает форму, поле формы и сообщение об ошибке
+  const errorElement = formElement.querySelector(`.${inputElement.id}-error`) //поиск элемента, предназначенного для отображения сообщения об ошибке
+  inputElement.classList.add('popup__input-type-error') //добавляю класс со стиялми для подсветки поля ввода как недопустимого или с ошибкой.
+  errorElement.classList.add('form__input-error_active') //добавляю класс со стилями для отображения сообщения об ошибке.
+  errorElement.textContent = errorMessage; //устанавливаю текст сообщения об ошибке (errorMessage) внутри элемента ошибки
+}
+
+const hideInputError = (formElement, inputElement) => { //функция скрытия ошибки, принимает форму и поле формы 
+  const errorElement = formElement.querySelector(`.${inputElement.id}-error`) //поиск элемента, предназначенного для отображения сообщения об ошибке
+  inputElement.classList.remove('popup__input-type-error') //убираю класс со стилями для подсветки поля ввода как недопустимого или с ошибкой.
+  errorElement.classList.remove('form__input-error_active')//убираю класс со стилями для отображения сообщения об ошибке.
+  errorElement.textContent = '' //устанавливаю пустую строку внутри элемента ошибки
+}
+
+const checkInputValidity = (formElement, inputElement) => { //функция для проверки валидности введенных данных в текстовом поле формы
+  if(inputElement.validity.patternMismatch) { // проверка наличия несоответствий шаблону (pattern)
+    inputElement.setCustomValidity('Поле может содержать только латинские и кириллические буквы, знаки дефиса и пробелы') // Если есть несоответствие, устанавливаем пользовательское сообщение об ошибке
+  } else {
+    inputElement.setCustomValidity('') // Если нет несоответствий, сбрасываем пользовательское сообщение
+  }
+
+
+  if(!inputElement.validity.valid) { // Проверка общей валидности поля
+    showInputError(formElement, inputElement, inputElement.validationMessage); // Если поле невалидно, вызываем функцию отображения ошибки
+  } else {
+    hideInputError(formElement, inputElement) // Если поле валидно, вызываем функцию скрытия ошибки
+  }
+
+}
+
+
+const setEventListeners = (formElement) => {
+  const inputList = Array.from(formElement.querySelectorAll('.popup__input'))
+  inputList.forEach((inputElement) => {
+    inputElement.addEventListener('input', function () {
+      checkInputValidity(formElement, inputElement)
+    })
+  })
+}
+
+const enableValidation = () => {
+  const formList = Array.from(document.querySelectorAll('.popup__form'))
+  formList.forEach((formElement) => {
+    formElement.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+    })
+    setEventListeners(formElement)
+  })
+}
+
+enableValidation()
+
 //функция изменения полей формы
 function handleProfileFormSubmit(event) {
   event.preventDefault(); //отменяю стандартное поведение браузера
@@ -48,14 +104,14 @@ function addNewCard(event) {
   const titleInput = addCardForm.elements["place-name"].value; //получаю значение из поля title
   const linkInput = addCardForm.elements["link"].value; //получаю значение из поля link
   const newCards = createCard(titleInput, linkInput, removeCard, likeCard, openImagePopup); //создаю новую карточку и кладу в функцию создания всех карточек + атрибуты
-  placesList.prepend(newCards); //добавляю карточку в список карточек
+  placesList.prepend(newCards); //добавляю карточку в начало списка карточек
   addCardForm.reset(); //сбрасываю форму
   closeModal(popupTypeNewCard); //закрываю модальное окно
 }
 
 addCardForm.addEventListener("submit", addNewCard); //вешаю обработчик с функцией добавления новой карточки
 
-//обработчик клика по оверлею и крестику (спасибо за интересный способ, запомню <3)
+//обработчик клика по оверлею и крестику 
 popups.forEach((popup) => {
   //прохожусь массивом по каждому
   popup.addEventListener("mousedown", (event) => {
@@ -71,20 +127,21 @@ popups.forEach((popup) => {
   });
 });
 
-//отслеживаю клик по кнопке попапа и открываю его через функцию
+//отслеживаю клик по кнопке попапа редактирования профиля и открываю его через функцию
 profileEditButton.addEventListener("click", function () {
   popupInputTypeName.value = profileTitle.textContent; //по умолчанию ставлю в поля формы значение из поля профиля
   popupInputTypeDescription.value = profileDescription.textContent; //и дискрипшна
   openModal(popupTypeEdit);
 });
 
+//отслеживаю клик по кнопке попапа добавления новой карточки и открываю его через функцию
 profileAddButton.addEventListener("click", function () {
   openModal(popupTypeNewCard);
 });
 
 // Функция открытия фото карточки Fullscreen
 export function openImagePopup(event) {
-  const clickedCard = event.target.closest(".card"); //кликнутая карточка
+  const clickedCard = event.target.closest(".card"); //кликнутая карточка (общий класс)
   const clickedImage = clickedCard.querySelector(".card__image"); //картинка карточки
   const clickedTitle = clickedCard.querySelector(".card__title"); //элемент с текстом
   if (event.target === clickedImage) {
