@@ -30,8 +30,12 @@ const popupInputTypeName = document.querySelector(".popup__input_type_name");
 const popupInputTypeDescription = document.querySelector(".popup__input_type_description");
 
 
-
-
+const resetValidation = (formElement) => { //функция очистки полей ошибки
+  const inputList = Array.from(formElement.querySelectorAll('.popup__input')); //создаю массив из всех полей ввода
+  inputList.forEach((inputElement) => { //прохожусь по ним и для каждого элемента
+    hideInputError(formElement, inputElement); //скрываю ошибку
+  });
+};
 
 const showInputError = (formElement, inputElement, errorMessage) => { //функция показа ошибки, принимает форму, поле формы и сообщение об ошибке
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`) //поиск элемента, предназначенного для отображения сообщения об ошибке
@@ -64,26 +68,47 @@ const checkInputValidity = (formElement, inputElement) => { //функция д�
 }
 
 
-const setEventListeners = (formElement) => {
-  const inputList = Array.from(formElement.querySelectorAll('.popup__input'))
-  inputList.forEach((inputElement) => {
+const setEventListeners = (formElement) => { //настройка обработчиков событий валидации для формы
+  const inputList = Array.from(formElement.querySelectorAll('.popup__input')) //создаю массив inputList, который содержит все поля формы
+  const buttonElement = formElement.querySelector('.popup__button') //элемент кнопки в форме с классом popup__button.
+  toggleButtonState(inputList, buttonElement) //вызов функции проверки валидности кнопки
+  inputList.forEach((inputElement) => { //устанавливаю обработчик события input для каждого элемента в массиве inputList.
     inputElement.addEventListener('input', function () {
-      checkInputValidity(formElement, inputElement)
+      checkInputValidity(formElement, inputElement) //проверяю валидность конкретного поля ввода и обновдяю сообщение об ошибке, если необходимо.
+      toggleButtonState(inputList, buttonElement) //вызов функции проверки валидности кнопки
     })
   })
 }
 
-const enableValidation = () => {
-  const formList = Array.from(document.querySelectorAll('.popup__form'))
-  formList.forEach((formElement) => {
+const enableValidation = () => { //включения валидации форм на странице.
+  const formList = Array.from(document.querySelectorAll('.popup__form')) //массив formList, содержащий все элементы форм на странице
+  formList.forEach((formElement) => { //на каждую форму в массиве вешаю обработчик сабмит и убираю стандарное поведение браузера
     formElement.addEventListener('submit', (evt) => {
       evt.preventDefault();
     })
-    setEventListeners(formElement)
+    const fieldsetList = Array.from(formElement.querySelectorAll('.form__set')) //создаю массив fieldsetList для всех элементов формы на странице
+    fieldsetList.forEach((fieldSet) => {
+      setEventListeners(fieldSet) //для каждого fieldSet вызывается функция обработчика для полей ввода
+    })
+    setEventListeners(formElement) //вызываю функцию для текущей формы, устанавливая обработчики событий для всех полей ввода внутри нее.
   })
 }
 
-enableValidation()
+enableValidation() //вызываю функцию валидации форм на странице.
+
+function hasInvalidInput(inputList) { //проверяю массив элементов ввода на наличие хотя бы одного невалидного элемента.
+  return inputList.some((input) => { //прохожусь методом some по каждому импуту. 
+    return !input.validity.valid //возвращаю true, если хотя бы один не валиден
+  })
+}
+
+function toggleButtonState(inputList, buttonElement) { //функция изменяет состояние кнопки
+  if(hasInvalidInput(inputList)) { //если хотя бы одно поле не валидно
+    buttonElement.classList.add('popup__button-off') //добаляю класс
+  } else {
+    buttonElement.classList.remove('popup__button-off') //если нет — убираю
+  }
+}
 
 //функция изменения полей формы
 function handleProfileFormSubmit(event) {
@@ -131,7 +156,9 @@ popups.forEach((popup) => {
 profileEditButton.addEventListener("click", function () {
   popupInputTypeName.value = profileTitle.textContent; //по умолчанию ставлю в поля формы значение из поля профиля
   popupInputTypeDescription.value = profileDescription.textContent; //и дискрипшна
+  resetValidation(popupTypeEdit) //скрываю прошлые ошибки валидации
   openModal(popupTypeEdit);
+  
 });
 
 //отслеживаю клик по кнопке попапа добавления новой карточки и открываю его через функцию

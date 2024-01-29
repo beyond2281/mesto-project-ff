@@ -34,6 +34,7 @@
         <div class="popup__content">
           <button type="button" aria-label="Кнопка закрытия всплывающего окна" class="popup__close"></button>
           <h3 class="popup__title">Редактировать профиль</h3>
+          <fieldset class="form__set">
           <form class="popup__form" name="edit-profile" novalidate>
             <label class="form__field">
             <input type="text" name="name" class="popup__input popup__input_type_name" id="input-name" placeholder="Имя" minlength="2" maxlength="40" pattern="^[a-zA-Zа-яА-яЁё\-\s]+$" required />
@@ -45,6 +46,7 @@
           </label>
             <button type="submit" class="button popup__button">Сохранить</button>
           </form>
+        </fieldset>
         </div>
       </div>
 
@@ -52,11 +54,13 @@
         <div class="popup__content">
           <button type="button" aria-label="Кнопка закрытия всплывающего окна с контентом" class="popup__close"></button>
           <h3 class="popup__title">Новое место</h3>
+          <fieldset class="form__set">
           <form class="popup__form" name="new-place">
             <input type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" required />
             <input type="url" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required />
             <button type="submit" class="button popup__button">Сохранить</button>
           </form>
+        </fieldset>
         </div>
       </div>
 
