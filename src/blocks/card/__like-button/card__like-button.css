@@ -15,6 +15,19 @@
   transition: 0.3s;
 }
 
+.block__like {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.like-counter {
+font-size: 13px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
 .card__like-button:hover {
   opacity: 0.6;
 }

@@ -18,7 +18,7 @@ fieldset {
   margin-bottom: 0;
 }
 
-.popup__input-type-error {
+.popup__input_type_error {
   border-bottom-color: red;
 }
 
@@ -32,7 +32,7 @@ fieldset {
   margin-top: 5px;
 }
 
-.form__input-error_active {
+.popup__error_visible {
   opacity: 1;
   
 }
