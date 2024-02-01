@@ -3,8 +3,8 @@ import "./pages/index.css";
 // import { initialCards } from "./components/cards.js";
 import { createCard, removeCard, likeCard } from "./components/card.js";
 import { openModal, closeModal } from "./components/modal.js";
-import { clearValidation, enableValidation } from "./components/validation.js"
-import { userInfo, getCard, userEdit, newCardAddServer } from "./api.js"
+import { clearValidation, enableValidation } from "./components/validation.js";
+import { userInfo, getCard, userEdit, newCardAddServer } from "./api.js";
 
 // @todo: DOM узлы
 const placesList = document.querySelector(".places__list"); //список карточек
@@ -23,7 +23,7 @@ const popupCaptionPopup = document.querySelector(".popup__caption"); //текс�
 //текстовые поля в шапке профиля
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
-const profileImage = document.querySelector('.profile__image')
+const profileImage = document.querySelector(".profile__image");
 //форма редактирования данных
 const editProfileForm = document.forms["edit-profile"];
 //форма добавления новой карточки
@@ -31,42 +31,34 @@ const addCardForm = document.forms["new-place"];
 //поля формы редактирования данных
 const popupInputTypeName = document.querySelector(".popup__input_type_name");
 const popupInputTypeDescription = document.querySelector(".popup__input_type_description");
+enableValidation(); //вызываю функцию валидации форм на странице.
 
-enableValidation() //вызываю функцию валидации форм на странице.
+let currentUser;
 
-userInfo()
-.then ((res) => {
-  if(res.ok) {
-    return res.json()
-  } else {
-    return Promise.reject(`Ошибка: ${res.status}`);
-  }
-})
-.then ((data) => {
-  profileTitle.textContent = data.name
-  profileDescription.textContent= data.about
-  profileImage.style.backgroundImage = `url(${data.avatar})`
-})
-.catch ((error) => {
-  console.log(`Ошибка: ${error.message}`)
-})
+Promise.all([userInfo(), getCard()])
+  .then(([userData, cardData]) => {
+    const currentUserID = userData._id;
+    currentUser = userData._id;
+    profileTitle.textContent = userData.name;
+    profileDescription.textContent = userData.about;
+    profileImage.style.backgroundImage = `url(${userData.avatar})`;
 
-getCard()
-.then ((res) => {
-  if(res.ok) {
-    return res.json()
-  } else {
-    return Promise.reject(`Ошибка: ${res.status}`);
-  }
-})
-.then ((data) => {
-  data.forEach(function (element) {
-    placesList.append(createCard(element.name, element.link, removeCard, likeCard, openImagePopup))
+    cardData.forEach(function (element) {
+      const cardData = {
+        name: element.name,
+        link: element.link,
+        likes: element.likes,
+        id: element._id,
+        userId: element.owner._id,
+      };
+
+      placesList.append(createCard(cardData, removeCard, likeCard, openImagePopup, currentUserID));
+    });
   })
-})
-.catch ((error) => {
-  console.log(`Ошибка: ${error.message}`)
-}) 
+  .catch((error) => {
+    console.log(`Ошибка: ${error.message}`);
+  });
+
 
 
 //функция изменения полей формы
@@ -77,29 +69,28 @@ function handleProfileFormSubmit(event) {
 
   const user = {
     name: popupInputTypeName.value,
-    about: popupInputTypeDescription.value
-  }
+    about: popupInputTypeDescription.value,
+  };
   userEdit(user)
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  })
- .then ((data) => {
-  profileTitle.textContent = data.name
-  profileDescription.textContent = data.about
- })
- .catch ((error) => {
-  console.log(`Ошибка: ${error.message}`)
- })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        return Promise.reject(`Ошибка: ${res.status}`);
+      }
+    })
+    .then((data) => {
+      profileTitle.textContent = data.name;
+      profileDescription.textContent = data.about;
+    })
+    .catch((error) => {
+      console.log(`Ошибка: ${error.message}`);
+    });
 
   profileTitle.textContent = popupInputTypeName.value; //присваиваю текстовому значению profileTitle то, что будет в поле popupInputTypeName.value
   profileDescription.textContent = popupInputTypeDescription.value; //присваиваю текстовому значению profileDescription то, что будет в поле popupInputTypeDescription.value
   closeModal(popupTypeEdit); //закрываю попап
 }
-
 
 //обработчик события submit
 editProfileForm.addEventListener("submit", handleProfileFormSubmit);
@@ -112,30 +103,30 @@ function addNewCard(event) {
 
   const card = {
     name: titleInput,
-    link: linkInput
-  }
+    link: linkInput,
+  };
   newCardAddServer(card)
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  })
-  .then ((data) => {
-    const newCards = createCard(data.name, data.link, removeCard, likeCard, openImagePopup); //создаю новую карточку и кладу в функцию создания всех карточек + атрибуты
-    placesList.prepend(newCards); //добавляю карточку в начало списка карточек
-    addCardForm.reset(); //сбрасываю форму
-    closeModal(popupTypeNewCard); //закрываю модальное окно
-  })
-  .catch ((error) => {
-    console.log(`Ошибка: ${error.message}`)
-  })
+    .then((cardData) => {
+      const dataCard = {
+        name: cardData.name,
+        link: cardData.link,
+        likes: cardData.likes,
+        id: cardData._id,
+        userId: cardData.owner._id,
+      };
+      const newCards = createCard(dataCard, removeCard, likeCard, openImagePopup, currentUser); //создаю новую карточку и кладу в функцию создания всех карточек + атрибуты
+      placesList.prepend(newCards); //добавляю карточку в начало списка карточек
+      addCardForm.reset(); //сбрасываю форму
+      closeModal(popupTypeNewCard); //закрываю модальное окно
+    })
+    .catch((error) => {
+      console.log(`Ошибка: ${error.message}`);
+    });
 }
 
 addCardForm.addEventListener("submit", addNewCard); //вешаю обработчик с функцией добавления новой карточки
 
-//обработчик клика по оверлею и крестику 
+//обработчик клика по оверлею и крестику
 popups.forEach((popup) => {
   //прохожусь массивом по каждому
   popup.addEventListener("mousedown", (event) => {
@@ -155,9 +146,8 @@ popups.forEach((popup) => {
 profileEditButton.addEventListener("click", function () {
   popupInputTypeName.value = profileTitle.textContent; //по умолчанию ставлю в поля формы значение из поля профиля
   popupInputTypeDescription.value = profileDescription.textContent; //и дискрипшна
-  clearValidation(popupTypeEdit) //скрываю прошлые ошибки валидации
+  clearValidation(popupTypeEdit); //скрываю прошлые ошибки валидации
   openModal(popupTypeEdit);
-  
 });
 
 //отслеживаю клик по кнопке попапа добавления новой карточки и открываю его через функцию

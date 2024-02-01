@@ -12,12 +12,26 @@ export function userInfo() {
       authorization: config.headers.authorization
     }
   })
+  .then ((res) => {
+    if(res.ok) {
+      return res.json()
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
 }
 
 export function getCard() {
   return fetch(`${config.baseUrl}/cards`, {
     headers: {
       authorization: config.headers.authorization
+    }
+  })
+  .then ((res) => {
+    if(res.ok) {
+      return res.json()
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
     }
   })
 }
@@ -48,4 +62,45 @@ export function newCardAddServer(card) {
       link: card.link
     })
   })
+  .then ((res) => {
+    if(res.ok) {
+      return res.json()
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
 }
+
+export function deleteCard(id) {
+  return fetch(`${config.baseUrl}/cards/${id}`, {
+    method: "DELETE",
+    headers: {
+      authorization: config.headers.authorization,
+    }
+  })
+  .then ((res) => {
+    if(res.ok) {
+      return res.json()
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
+}
+
+export function pushLikeCard(id) {
+  return fetch(`${config.baseUrl}/cards/likes/${id}`, {
+    method: "PUT",
+    headers: {
+      authorization: config.headers.authorization,
+    }
+  })
+  .then ((res) => {
+    if(res.ok) {
+      return res.json()
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
+}
+
+ 
