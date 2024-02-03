@@ -1,10 +1,12 @@
-import {deleteCard, pushLikeCard } from "../api.js"
+import {deleteCard, pushLikeCard, delLikeCard } from "../api.js"
+// import { openModal } from "../components/modal.js"
+
 // @todo: Темплейт карточки
 export const articleTemplate = document.querySelector("#card-template").content;
 
 
 // @todo: Функция создания карточки
-export function createCard(cardData, removeCard, likeCard, openImageModal, currentUserID) {
+export function createCard(cardData, removeCard, likeCard, openImageModal, currentUserID, modalDel) {
   const cardElement = articleTemplate.querySelector(".card").cloneNode(true);
   const deleteButton = cardElement.querySelector(".card__delete-button");
   const likeButton = cardElement.querySelector(".card__like-button");
@@ -18,13 +20,17 @@ export function createCard(cardData, removeCard, likeCard, openImageModal, curre
   cardImage.src = cardData.link;
   cardImage.alt = cardData.name;
   cardImage.id = cardData.id;
-  likeCounter.textContent = cardData.likes.length
+  likeCounter.textContent = Object.keys(cardData.likes).length
   cardElement.querySelector(".card__title").textContent = cardData.name;
   deleteButton.addEventListener("click", function (event) {
-    removeCard(cardData.id, event)
+    modalDel(function () {
+      removeCard(cardData.id, event);
+    });
   });
   cardImage.addEventListener("click", openImageModal);
-  likeButton.addEventListener("click", likeCard);
+  likeButton.addEventListener("click", function () {
+    likeCard(cardData.id, likeCounter, likeButton)
+  });
   return cardElement;
 }
 
@@ -44,7 +50,26 @@ export function removeCard(id, event) {
 }
 
 //функция лайка
-export function likeCard(id) {
-  pushLikeCard(id)
-  event.target.classList.toggle("card__like-button_is-active"); //навешиваю или снимаю лайк
+export function likeCard(id, likeCounter, likeButton) {
+  if (!likeButton.classList.contains("card__like-button_is-active")) {
+    pushLikeCard(id)
+      .then((data) => {
+        likeButton.classList.add("card__like-button_is-active"); 
+        likeCounter.textContent = Object.keys(data.likes).length
+      })
+      .catch((error) => {
+        console.log(`Ошибка: ${error.message}`);
+      });
+  } else if (likeButton.classList.contains("card__like-button_is-active")) {
+    delLikeCard(id)
+    .then((data) => {
+      likeButton.classList.remove("card__like-button_is-active"); 
+      likeCounter.textContent = Object.keys(data.likes).length
+    })
+    .catch((error) => {
+      console.log(`Ошибка: ${error.message}`);
+    });
+  }
 }
+
+//понять, почему лайк не остаётся после перезагрузки

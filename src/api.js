@@ -48,6 +48,13 @@ export function userEdit(user) {
       about: user.about
     })
   })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
 }
 
 export function newCardAddServer(card) {
@@ -90,6 +97,22 @@ export function deleteCard(id) {
 export function pushLikeCard(id) {
   return fetch(`${config.baseUrl}/cards/likes/${id}`, {
     method: "PUT",
+    headers: {
+      authorization: config.headers.authorization,
+    }
+  })
+  .then ((res) => {
+    if(res.ok) {
+      return res.json()
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
+}
+
+export function delLikeCard(id) {
+  return fetch(`${config.baseUrl}/cards/likes/${id}`, {
+    method: "DELETE",
     headers: {
       authorization: config.headers.authorization,
     }

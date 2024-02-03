@@ -4,3 +4,17 @@
   object-fit: cover;
   display: block;
 }
+
+.popup__accept-delete-img{
+  min-height: 181px;
+  padding: 30px;
+}
+
+.popup__accept-delete-title {
+  margin-top: 5px;
+  margin-left: 5px;
+}
+
+.popup__accept-button {
+  margin-top: 34px;
+}

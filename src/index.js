@@ -1,7 +1,7 @@
 // Импорты
 import "./pages/index.css";
 // import { initialCards } from "./components/cards.js";
-import { createCard, removeCard, likeCard } from "./components/card.js";
+import { createCard, removeCard, likeCard} from "./components/card.js";
 import { openModal, closeModal } from "./components/modal.js";
 import { clearValidation, enableValidation } from "./components/validation.js";
 import { userInfo, getCard, userEdit, newCardAddServer } from "./api.js";
@@ -14,6 +14,7 @@ const popups = document.querySelectorAll(".popup");
 const popupTypeEdit = document.querySelector(".popup_type_edit"); //попап редактирования профиля
 const popupTypeNewCard = document.querySelector(".popup_type_new-card"); //попап добавления новой карточки
 const popupTypeImage = document.querySelector(".popup_type_image"); //попап фулскрин фото карточки
+const popupDeleteImage = document.querySelector('.popup_delete_image')
 //кнопки их открытия
 const profileEditButton = document.querySelector(".profile__edit-button"); //кнопка редактирования профиля
 const profileAddButton = document.querySelector(".profile__add-button"); //кнопка добавления карточки
@@ -31,6 +32,8 @@ const addCardForm = document.forms["new-place"];
 //поля формы редактирования данных
 const popupInputTypeName = document.querySelector(".popup__input_type_name");
 const popupInputTypeDescription = document.querySelector(".popup__input_type_description");
+
+
 enableValidation(); //вызываю функцию валидации форм на странице.
 
 let currentUser;
@@ -52,7 +55,7 @@ Promise.all([userInfo(), getCard()])
         userId: element.owner._id,
       };
 
-      placesList.append(createCard(cardData, removeCard, likeCard, openImagePopup, currentUserID));
+      placesList.append(createCard(cardData, removeCard, likeCard, openImagePopup, currentUserID, modalDel));
     });
   })
   .catch((error) => {
@@ -72,13 +75,6 @@ function handleProfileFormSubmit(event) {
     about: popupInputTypeDescription.value,
   };
   userEdit(user)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      } else {
-        return Promise.reject(`Ошибка: ${res.status}`);
-      }
-    })
     .then((data) => {
       profileTitle.textContent = data.name;
       profileDescription.textContent = data.about;
@@ -114,7 +110,7 @@ function addNewCard(event) {
         id: cardData._id,
         userId: cardData.owner._id,
       };
-      const newCards = createCard(dataCard, removeCard, likeCard, openImagePopup, currentUser); //создаю новую карточку и кладу в функцию создания всех карточек + атрибуты
+      const newCards = createCard(dataCard, removeCard, likeCard, openImagePopup, currentUser, modalDel); //создаю новую карточку и кладу в функцию создания всех карточек + атрибуты
       placesList.prepend(newCards); //добавляю карточку в начало списка карточек
       addCardForm.reset(); //сбрасываю форму
       closeModal(popupTypeNewCard); //закрываю модальное окно
@@ -155,6 +151,10 @@ profileAddButton.addEventListener("click", function () {
   openModal(popupTypeNewCard);
 });
 
+popupTypeImage.addEventListener('click', function () {
+  openModal(popupTypeImage);
+})
+
 // Функция открытия фото карточки Fullscreen
 export function openImagePopup(event) {
   const clickedCard = event.target.closest(".card"); //кликнутая карточка (общий класс)
@@ -166,4 +166,15 @@ export function openImagePopup(event) {
     popupCaptionPopup.textContent = clickedTitle.textContent; //текст под карточкой
     openModal(popupTypeImage); //вызвать функцию открытия модельного окна с атрибутом попапа фулскрина
   }
+}
+
+//функция открытия попапа с подтверждением удаления карточки
+export function modalDel(callback) {
+  openModal(popupDeleteImage);
+  popupDeleteImage.querySelector('.popup__button').addEventListener('click', function () {
+    closeModal(popupDeleteImage);
+    if (callback) {
+      callback();
+    }
+  });
 }
