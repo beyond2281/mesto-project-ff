@@ -115,6 +115,7 @@ export function delLikeCard(id) {
     method: "DELETE",
     headers: {
       authorization: config.headers.authorization,
+      'Content-Type': 'application/json'
     }
   })
   .then ((res) => {
@@ -126,4 +127,21 @@ export function delLikeCard(id) {
   })
 }
 
- 
+export function editiserInfo(link) {
+  return fetch(`${config.baseUrl}/users/me/avatar`, {
+    method: "PATCH",
+    headers: {
+      authorization: config.headers.authorization,
+    },
+    body: JSON.stringify({
+      avatar: link.avatar,
+    })
+  })
+  .then ((res) => {
+    if(res.ok) {
+      return res.json()
+    } else {
+      return Promise.reject(`Ошибка: ${res.status}`);
+    }
+  })
+}

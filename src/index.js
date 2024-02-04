@@ -4,7 +4,7 @@ import "./pages/index.css";
 import { createCard, removeCard, likeCard} from "./components/card.js";
 import { openModal, closeModal } from "./components/modal.js";
 import { clearValidation, enableValidation } from "./components/validation.js";
-import { userInfo, getCard, userEdit, newCardAddServer } from "./api.js";
+import { userInfo, getCard, userEdit, newCardAddServer, editiserInfo } from "./api.js";
 
 // @todo: DOM узлы
 const placesList = document.querySelector(".places__list"); //список карточек
@@ -15,6 +15,7 @@ const popupTypeEdit = document.querySelector(".popup_type_edit"); //попап �
 const popupTypeNewCard = document.querySelector(".popup_type_new-card"); //попап добавления новой карточки
 const popupTypeImage = document.querySelector(".popup_type_image"); //попап фулскрин фото карточки
 const popupDeleteImage = document.querySelector('.popup_delete_image')
+const popupTypeEditAvatar = document.querySelector('.popup_type_edit-avatar')
 //кнопки их открытия
 const profileEditButton = document.querySelector(".profile__edit-button"); //кнопка редактирования профиля
 const profileAddButton = document.querySelector(".profile__add-button"); //кнопка добавления карточки
@@ -37,6 +38,19 @@ const popupInputTypeDescription = document.querySelector(".popup__input_type_des
 enableValidation(); //вызываю функцию валидации форм на странице.
 
 let currentUser;
+
+function updateAvatar(event) {
+  event.preventDefault()
+  const link = profileImage.value
+  editiserInfo(link)
+  .then ((link) => {
+    profileImage.style.backgroundImage = `url(${link.avatar})`;
+  })
+}
+
+profileImage.addEventListener('click', function () {
+  openModal(popupTypeEditAvatar)
+})
 
 Promise.all([userInfo(), getCard()])
   .then(([userData, cardData]) => {

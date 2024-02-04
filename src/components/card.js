@@ -21,6 +21,13 @@ export function createCard(cardData, removeCard, likeCard, openImageModal, curre
   cardImage.alt = cardData.name;
   cardImage.id = cardData.id;
   likeCounter.textContent = Object.keys(cardData.likes).length
+  cardData.likes.forEach((element) => {
+    if(element._id === currentUserID) {
+      likeButton.classList.add("card__like-button_is-active"); 
+    } else {
+      likeButton.classList.remove("card__like-button_is-active"); 
+    }
+  })
   cardElement.querySelector(".card__title").textContent = cardData.name;
   deleteButton.addEventListener("click", function (event) {
     modalDel(function () {
@@ -29,7 +36,10 @@ export function createCard(cardData, removeCard, likeCard, openImageModal, curre
   });
   cardImage.addEventListener("click", openImageModal);
   likeButton.addEventListener("click", function () {
-    likeCard(cardData.id, likeCounter, likeButton)
+    
+      likeCard(cardData.id, likeCounter, likeButton)
+ 
+    
   });
   return cardElement;
 }
