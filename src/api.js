@@ -1,39 +1,37 @@
 export const config = {
-baseUrl: 'https://nomoreparties.co/v1/wff-cohort-5',
+  baseUrl: "https://nomoreparties.co/v1/wff-cohort-5",
   headers: {
-    authorization: '87c8aa25-04d0-4103-a6d9-c45510e9c4e5',
-    'Content-Type': 'application/json'
-  }
-}
+    authorization: "87c8aa25-04d0-4103-a6d9-c45510e9c4e5",
+    "Content-Type": "application/json",
+  },
+};
 
 export function userInfo() {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: {
-      authorization: config.headers.authorization
-    }
-  })
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
+      authorization: config.headers.authorization,
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }
 
 export function getCard() {
   return fetch(`${config.baseUrl}/cards`, {
     headers: {
-      authorization: config.headers.authorization
-    }
-  })
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
+      authorization: config.headers.authorization,
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }
 
 export function userEdit(user) {
@@ -41,20 +39,19 @@ export function userEdit(user) {
     method: "PATCH",
     headers: {
       authorization: config.headers.authorization,
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       name: user.name,
-      about: user.about
-    })
-  })
-  .then((res) => {
+      about: user.about,
+    }),
+  }).then((res) => {
     if (res.ok) {
       return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }
 
 export function newCardAddServer(card) {
@@ -62,20 +59,19 @@ export function newCardAddServer(card) {
     method: "POST",
     headers: {
       authorization: config.headers.authorization,
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       name: card.name,
-      link: card.link
-    })
-  })
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
+      link: card.link,
+    }),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }
 
 export function deleteCard(id) {
@@ -83,15 +79,14 @@ export function deleteCard(id) {
     method: "DELETE",
     headers: {
       authorization: config.headers.authorization,
-    }
-  })
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }
 
 export function pushLikeCard(id) {
@@ -99,15 +94,14 @@ export function pushLikeCard(id) {
     method: "PUT",
     headers: {
       authorization: config.headers.authorization,
-    }
-  })
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }
 
 export function delLikeCard(id) {
@@ -115,33 +109,32 @@ export function delLikeCard(id) {
     method: "DELETE",
     headers: {
       authorization: config.headers.authorization,
-      'Content-Type': 'application/json'
-    }
-  })
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
+      "Content-Type": "application/json",
+    },
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }
 
-export function editiserInfo(link) {
+export function editUserAvatar(linkImgAvatar) {
   return fetch(`${config.baseUrl}/users/me/avatar`, {
     method: "PATCH",
     headers: {
       authorization: config.headers.authorization,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      avatar: link.avatar,
-    })
-  })
-  .then ((res) => {
-    if(res.ok) {
-      return res.json()
+      avatar: linkImgAvatar,
+    }),
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       return Promise.reject(`Ошибка: ${res.status}`);
     }
-  })
+  });
 }

@@ -1,10 +1,10 @@
 // Импорты
 import "./pages/index.css";
 // import { initialCards } from "./components/cards.js";
-import { createCard, removeCard, likeCard} from "./components/card.js";
+import { createCard, removeCard, likeCard } from "./components/card.js";
 import { openModal, closeModal } from "./components/modal.js";
 import { clearValidation, enableValidation } from "./components/validation.js";
-import { userInfo, getCard, userEdit, newCardAddServer, editiserInfo } from "./api.js";
+import { userInfo, getCard, userEdit, newCardAddServer, editUserAvatar } from "./api.js";
 
 // @todo: DOM узлы
 const placesList = document.querySelector(".places__list"); //список карточек
@@ -14,8 +14,8 @@ const popups = document.querySelectorAll(".popup");
 const popupTypeEdit = document.querySelector(".popup_type_edit"); //попап редактирования профиля
 const popupTypeNewCard = document.querySelector(".popup_type_new-card"); //попап добавления новой карточки
 const popupTypeImage = document.querySelector(".popup_type_image"); //попап фулскрин фото карточки
-const popupDeleteImage = document.querySelector('.popup_delete_image')
-const popupTypeEditAvatar = document.querySelector('.popup_type_edit-avatar')
+const popupDeleteImage = document.querySelector(".popup_delete_image"); //попап удаления карточки (подтверждение)
+const popupTypeEditAvatar = document.querySelector(".popup_type_edit-avatar"); //попап редактирования аватара
 //кнопки их открытия
 const profileEditButton = document.querySelector(".profile__edit-button"); //кнопка редактирования профиля
 const profileAddButton = document.querySelector(".profile__add-button"); //кнопка добавления карточки
@@ -33,24 +33,11 @@ const addCardForm = document.forms["new-place"];
 //поля формы редактирования данных
 const popupInputTypeName = document.querySelector(".popup__input_type_name");
 const popupInputTypeDescription = document.querySelector(".popup__input_type_description");
-
-
-enableValidation(); //вызываю функцию валидации форм на странице.
-
+//поле ввода ссылки для редактирования аватара профиля
+const popupInputTypeAvatar = document.querySelector(".popup__input_type_avatar");
 let currentUser;
 
-function updateAvatar(event) {
-  event.preventDefault()
-  const link = profileImage.value
-  editiserInfo(link)
-  .then ((link) => {
-    profileImage.style.backgroundImage = `url(${link.avatar})`;
-  })
-}
-
-profileImage.addEventListener('click', function () {
-  openModal(popupTypeEditAvatar)
-})
+enableValidation(); //вызываю функцию валидации форм на странице.
 
 Promise.all([userInfo(), getCard()])
   .then(([userData, cardData]) => {
@@ -76,11 +63,10 @@ Promise.all([userInfo(), getCard()])
     console.log(`Ошибка: ${error.message}`);
   });
 
-
-
 //функция изменения полей формы
 function handleProfileFormSubmit(event) {
   event.preventDefault(); //отменяю стандартное поведение браузера
+  isLoadingSave(true);
   popupInputTypeName.value = event.target.elements.name.value; //получаю значение (value) из поля name
   popupInputTypeDescription.value = event.target.elements.description.value; //получаю значение (value) из поля description
 
@@ -95,6 +81,9 @@ function handleProfileFormSubmit(event) {
     })
     .catch((error) => {
       console.log(`Ошибка: ${error.message}`);
+    })
+    .finally(() => {
+      isLoadingSave(false);
     });
 
   profileTitle.textContent = popupInputTypeName.value; //присваиваю текстовому значению profileTitle то, что будет в поле popupInputTypeName.value
@@ -105,9 +94,40 @@ function handleProfileFormSubmit(event) {
 //обработчик события submit
 editProfileForm.addEventListener("submit", handleProfileFormSubmit);
 
+//Функция смены аватара юзера
+function updateAvatar(event) {
+  event.preventDefault();
+  isLoadingSave(true);
+
+  const linkImgAvatar = popupInputTypeAvatar.value;
+
+  editUserAvatar(linkImgAvatar)
+    .then((link) => {
+      profileImage.style.backgroundImage = `url(${link.avatar})`;
+      closeModal(popupTypeEditAvatar);
+    })
+    .catch((error) => {
+      console.log(`Ошибка: ${error.message}`);
+    })
+    .finally(() => {
+      isLoadingSave(false);
+    });
+}
+
+//Ловлю клик по иконке аватара
+profileImage.addEventListener("click", function () {
+  openModal(popupTypeEditAvatar);
+});
+
+//отправляю сабмит по кнопке и обновляю аватар
+popupTypeEditAvatar.addEventListener("submit", function (event) {
+  updateAvatar(event);
+});
+
 //Функция добавление новой карточки из формы
 function addNewCard(event) {
   event.preventDefault(); //отменяю стандартное поведение браузера
+  isLoadingSave(true);
   const titleInput = addCardForm.elements["place-name"].value; //получаю значение из поля title
   const linkInput = addCardForm.elements["link"].value; //получаю значение из поля link
 
@@ -131,6 +151,9 @@ function addNewCard(event) {
     })
     .catch((error) => {
       console.log(`Ошибка: ${error.message}`);
+    })
+    .finally(() => {
+      isLoadingSave(false);
     });
 }
 
@@ -165,9 +188,9 @@ profileAddButton.addEventListener("click", function () {
   openModal(popupTypeNewCard);
 });
 
-popupTypeImage.addEventListener('click', function () {
+popupTypeImage.addEventListener("click", function () {
   openModal(popupTypeImage);
-})
+});
 
 // Функция открытия фото карточки Fullscreen
 export function openImagePopup(event) {
@@ -185,10 +208,22 @@ export function openImagePopup(event) {
 //функция открытия попапа с подтверждением удаления карточки
 export function modalDel(callback) {
   openModal(popupDeleteImage);
-  popupDeleteImage.querySelector('.popup__button').addEventListener('click', function () {
+  popupDeleteImage.querySelector(".popup__button").addEventListener("click", function () {
     closeModal(popupDeleteImage);
     if (callback) {
       callback();
+    }
+  });
+}
+
+//Функция изменения надписи в кнопке
+function isLoadingSave(loading) {
+  const button = document.querySelectorAll(".popup__button");
+  button.forEach((element) => {
+    if (loading === true) {
+      element.textContent = "Сохранение...";
+    } else {
+      element.textContent = "Сохранение";
     }
   });
 }
