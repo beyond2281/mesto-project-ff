@@ -13,7 +13,7 @@ module.exports = {
     },
 
     mode: 'development', // добавили режим разработчика
-
+    devtool: 'source-map',
     devServer: {
       static: path.resolve(__dirname, './dist'), // путь, куда "смотрит" режим разработчика
       compress: true, // это ускорит загрузку в режиме разработки
@@ -36,8 +36,18 @@ module.exports = {
 
         {
           // регулярное выражение, которое ищет все файлы с такими расширениями
-          test: /\.(png|svg|jpg|gif|woff(2)?|eot|ttf|otf)$/,
+          test: /\.(png|svg|jpg|jpeg|gif)$/i,
           type: 'asset/resource',
+          generator: {
+              filename: 'images/[name].[hash][ext]',
+     }
+     },
+     {
+          test: /\.(woff(2)?|eot|ttf|otf)$/i,
+          type: 'asset/resource',
+          generator: {
+              filename: 'fonts/[name].[hash][ext]',
+          }
           
         },
 

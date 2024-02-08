@@ -6,18 +6,20 @@ export const config = {
   },
 };
 
+function handleResponse(res) {
+  if (res.ok) {
+    return res.json();
+  } else {
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }
+}
+
 export function userInfo() {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: {
       authorization: config.headers.authorization,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }
 
 export function getCard() {
@@ -25,13 +27,7 @@ export function getCard() {
     headers: {
       authorization: config.headers.authorization,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }
 
 export function userEdit(user) {
@@ -45,13 +41,7 @@ export function userEdit(user) {
       name: user.name,
       about: user.about,
     }),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }
 
 export function newCardAddServer(card) {
@@ -65,13 +55,7 @@ export function newCardAddServer(card) {
       name: card.name,
       link: card.link,
     }),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }
 
 export function deleteCard(id) {
@@ -80,13 +64,7 @@ export function deleteCard(id) {
     headers: {
       authorization: config.headers.authorization,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }
 
 export function pushLikeCard(id) {
@@ -95,13 +73,7 @@ export function pushLikeCard(id) {
     headers: {
       authorization: config.headers.authorization,
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }
 
 export function delLikeCard(id) {
@@ -111,13 +83,7 @@ export function delLikeCard(id) {
       authorization: config.headers.authorization,
       "Content-Type": "application/json",
     },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }
 
 export function editUserAvatar(linkImgAvatar) {
@@ -130,11 +96,5 @@ export function editUserAvatar(linkImgAvatar) {
     body: JSON.stringify({
       avatar: linkImgAvatar,
     }),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+  }).then(handleResponse);
 }

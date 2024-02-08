@@ -5,7 +5,7 @@ import { deleteCard, pushLikeCard, delLikeCard } from "../api.js";
 export const articleTemplate = document.querySelector("#card-template").content;
 
 // @todo: Функция создания карточки
-export function createCard(cardData, removeCard, likeCard, openImageModal, currentUserID, modalDel) {
+export function createCard(cardData, likeCard, openImageModal, currentUserID, showModalDel, cardToRemoveid, cardToRemoveElement) {
   const cardElement = articleTemplate.querySelector(".card").cloneNode(true);
   const deleteButton = cardElement.querySelector(".card__delete-button");
   const likeButton = cardElement.querySelector(".card__like-button");
@@ -14,6 +14,11 @@ export function createCard(cardData, removeCard, likeCard, openImageModal, curre
 
   if (currentUserID === cardData.userId) {
     deleteButton.style.display = "block";
+    deleteButton.addEventListener("click", function () {
+      cardToRemoveid = cardData.id;
+      cardToRemoveElement = cardElement;
+      showModalDel(cardData.id, cardToRemoveElement);
+    });
   } else {
     deleteButton.style.display = "none";
   }
@@ -21,35 +26,26 @@ export function createCard(cardData, removeCard, likeCard, openImageModal, curre
   cardImage.src = cardData.link;
   cardImage.alt = cardData.name;
   cardImage.id = cardData.id;
-  likeCounter.textContent = Object.keys(cardData.likes).length;
+  likeCounter.textContent = cardData.likes.length;
 
-  cardData.likes.forEach((element) => {
-    if (element._id === currentUserID) {
-      likeButton.classList.add("card__like-button_is-active");
-    } else {
-      likeButton.classList.remove("card__like-button_is-active");
-    }
-  });
+  if (cardData.likes.some((element) => element._id === currentUserID)) {
+    likeButton.classList.add("card__like-button_is-active");
+  }
 
   cardElement.querySelector(".card__title").textContent = cardData.name;
-  deleteButton.addEventListener("click", function (event) {
-    modalDel(function () {
-      removeCard(cardData.id, event);
-    });
-  });
-
   cardImage.addEventListener("click", openImageModal);
   likeButton.addEventListener("click", function () {
     likeCard(cardData.id, likeCounter, likeButton);
   });
+
   return cardElement;
 }
 
 // @todo: Функция удаления карточки
-export function removeCard(id, event) {
-  deleteCard(id)
+export function removeCard(id) {
+  return deleteCard(id)
     .then(() => {
-      event.target.closest(".card").remove();
+      document.querySelector(".card").remove();
     })
     .catch((error) => {
       console.log(`Ошибка: ${error.message}`);
