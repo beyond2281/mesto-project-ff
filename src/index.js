@@ -41,8 +41,6 @@ let currentUserID;
 let cardToRemoveid;
 let cardToRemoveElement;
 
-enableValidation(config); //вызываю функцию валидации форм на странице.
-
 Promise.all([userInfo(), getCard()])
   .then(([userData, cardData]) => {
     currentUserID = userData._id;
@@ -179,7 +177,7 @@ popups.forEach((popup) => {
 profileEditButton.addEventListener("click", function () {
   popupInputTypeName.value = profileTitle.textContent; //по умолчанию ставлю в поля формы значение из поля профиля
   popupInputTypeDescription.value = profileDescription.textContent; //и дискрипшна
-  clearValidation(popupTypeEdit); //скрываю прошлые ошибки валидации
+  clearValidation(popupTypeEdit, config); //скрываю прошлые ошибки валидации
   openModal(popupTypeEdit);
 });
 
@@ -227,3 +225,5 @@ export function showModalDel(idCard, eventElement) {
 function setLoadingSave(loading, buttonPopup) {
   buttonPopup.textContent = loading ? "Сохранение..." : "Сохранить";
 }
+
+enableValidation(config); //вызываю функцию валидации форм на странице.

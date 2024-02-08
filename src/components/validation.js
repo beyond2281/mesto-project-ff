@@ -1,18 +1,17 @@
 export { clearValidation, enableValidation };
-import { config } from "./config";
 
-function clearValidation(formElement) {
+function clearValidation(formElement, config) {
   //функция очистки полей ошибки
   const buttonElement = formElement.querySelector(config.submitButtonSelector);
   const inputList = Array.from(formElement.querySelectorAll(config.inputSelector)); //создаю массив из всех полей ввода
   inputList.forEach((inputElement) => {
     //прохожусь по ним и для каждого элемента
-    hideInputError(formElement, inputElement); //скрываю ошибку
-    disableSubmitButton(buttonElement, config, true); //дизейблю кнопку
+    hideInputError(formElement, inputElement, config); //скрываю ошибку
+    disableSubmitButton(buttonElement, config); //дизейблю кнопку
   });
 }
 
-function showInputError(formElement, inputElement, errorMessage) {
+function showInputError(formElement, inputElement, errorMessage, config) {
   //функция показа ошибки, принимает форму, поле формы и сообщение об ошибке
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`); //поиск элемента, предназначенного для отображения сообщения об ошибке
   inputElement.classList.add(config.inputErrorClass); //добавляю класс со стиялми для подсветки поля ввода как недопустимого или с ошибкой.
@@ -20,7 +19,7 @@ function showInputError(formElement, inputElement, errorMessage) {
   errorElement.textContent = errorMessage; //устанавливаю текст сообщения об ошибке (errorMessage) внутри элемента ошибки
 }
 
-function hideInputError(formElement, inputElement) {
+function hideInputError(formElement, inputElement, config) {
   //функция скрытия ошибки, принимает форму и поле формы
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`); //поиск элемента, предназначенного для отображения сообщения об ошибке
   inputElement.classList.remove(config.inputErrorClass); //убираю класс со стилями для подсветки поля ввода как недопустимого или с ошибкой.
@@ -28,7 +27,7 @@ function hideInputError(formElement, inputElement) {
   errorElement.textContent = ""; //устанавливаю пустую строку внутри элемента ошибки
 }
 
-function checkInputValidity(formElement, inputElement) {
+function checkInputValidity(formElement, inputElement, config) {
   //функция для проверки валидности введенных данных в текстовом поле формы
   if (inputElement.validity.patternMismatch) {
     // проверка наличия несоответствий шаблону (pattern)
@@ -39,21 +38,21 @@ function checkInputValidity(formElement, inputElement) {
 
   if (!inputElement.validity.valid) {
     // Проверка общей валидности поля
-    showInputError(formElement, inputElement, inputElement.validationMessage); // Если поле невалидно, вызываем функцию отображения ошибки
+    showInputError(formElement, inputElement, inputElement.validationMessage, config); // Если поле невалидно, вызываем функцию отображения ошибки
   } else {
-    hideInputError(formElement, inputElement); // Если поле валидно, вызываем функцию скрытия ошибки
+    hideInputError(formElement, inputElement, config); // Если поле валидно, вызываем функцию скрытия ошибки
   }
 }
 
-function setEventListeners(formElement) {
+function setEventListeners(formElement, config) {
   //настройка обработчиков событий валидации для формы
   const inputList = Array.from(formElement.querySelectorAll(config.inputSelector)); //создаю массив inputList, который содержит все поля формы
   const buttonElement = formElement.querySelector(config.submitButtonSelector); //элемент кнопки в форме с классом popup__button.
-  disableSubmitButton(buttonElement, config, true); //вызов функции проверки валидности кнопки
+  disableSubmitButton(buttonElement, config); //вызов функции проверки валидности кнопки
   inputList.forEach((inputElement) => {
     //устанавливаю обработчик события input для каждого элемента в массиве inputList.
     inputElement.addEventListener("input", function () {
-      checkInputValidity(formElement, inputElement); //проверяю валидность конкретного поля ввода и обновдяю сообщение об ошибке, если необходимо.
+      checkInputValidity(formElement, inputElement, config); //проверяю валидность конкретного поля ввода и обновдяю сообщение об ошибке, если необходимо.
       toggleButtonState(inputList, buttonElement, config); //вызов функции проверки валидности кнопки
     });
   });
@@ -67,11 +66,7 @@ function enableValidation(config) {
     formElement.addEventListener("submit", (evt) => {
       evt.preventDefault();
     });
-    const fieldsetList = Array.from(formElement.querySelectorAll(config.formSetSelector)); //создаю массив fieldsetList для всех элементов формы на странице
-    fieldsetList.forEach((fieldSet) => {
-      setEventListeners(fieldSet); //для каждого fieldSet вызывается функция обработчика для полей ввода
-    });
-    setEventListeners(formElement); //вызываю функцию для текущей формы, устанавливая обработчики событий для всех полей ввода внутри нее.
+    setEventListeners(formElement, config); //вызываю функцию для текущей формы, устанавливая обработчики событий для всех полей ввода внутри нее.
   });
 }
 
@@ -87,18 +82,14 @@ function toggleButtonState(inputList, buttonElement, config) {
   //функция изменяет состояние кнопки
   if (hasInvalidInput(inputList)) {
     //если хотя бы одно поле не валидно
-    disableSubmitButton(buttonElement, config, true);
+    disableSubmitButton(buttonElement, config);
   } else {
-    disableSubmitButton(buttonElement, config, false);
+    buttonElement.classList.remove(config.inactiveButtonClass);
+    buttonElement.disabled = false;
   }
 }
 
-function disableSubmitButton(button, config, disabled) {
-  if (disabled === true) {
-    button.classList.add(config.inactiveButtonClass);
-    button.disabled = disabled;
-  } else {
-    button.classList.remove(config.inactiveButtonClass);
-    button.disabled = disabled;
-  }
+function disableSubmitButton(button, config) {
+  button.classList.add(config.inactiveButtonClass);
+  button.disabled = true;
 }

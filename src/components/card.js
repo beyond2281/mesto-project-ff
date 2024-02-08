@@ -1,11 +1,10 @@
 import { deleteCard, pushLikeCard, delLikeCard } from "../api.js";
-// import { openModal } from "../components/modal.js"
 
 // @todo: Темплейт карточки
 export const articleTemplate = document.querySelector("#card-template").content;
 
 // @todo: Функция создания карточки
-export function createCard(cardData, likeCard, openImageModal, currentUserID, showModalDel, cardToRemoveid, cardToRemoveElement) {
+export function createCard(cardData, likeCard, openImageModal, currentUserID, showModalDel, cardToRemoveid, cardToRemoveElement) {//без этих двух параметров не работает удаление. если есть возможность, дайте комментарий, почему.
   const cardElement = articleTemplate.querySelector(".card").cloneNode(true);
   const deleteButton = cardElement.querySelector(".card__delete-button");
   const likeButton = cardElement.querySelector(".card__like-button");
